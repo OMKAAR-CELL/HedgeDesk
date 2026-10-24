@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextResponse } from "next/server";
 
 const AGENT_API_URL = process.env.AGENT_API_URL || "http://127.0.0.1:8000";
