@@ -21,8 +21,11 @@ class Job(Model):
     # Pricing
     fwd: Optional[float] = None
     options: Optional[List[Dict[str, float]]] = None
+    hist_edges: Optional[List[float]] = None
+    hist_pct: Optional[List[List[float]]] = None
     # Final text for the user (also used for early errors)
     reply: Optional[str] = None
+    result_json: Optional[str] = None  # structured result for the website
 
 
 def extend(job: Job, **fields) -> Job:

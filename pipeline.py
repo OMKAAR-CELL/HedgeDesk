@@ -64,6 +64,33 @@ def evaluate_options(amount, cost_inr, rates, fwd):
     return options
 
 
+def profit_histogram(amount, cost_inr, rates, fwd, options, bins=20):
+    """Shared bins for every hedge option so the chart can compare them.
+    Returns (edges, pct) where pct[i] is the % of scenarios per bin for options[i].
+    Bin edges are aligned so that 0 is a boundary when profits straddle zero."""
+    series = []
+    for o in options:
+        h = o["ratio"]
+        locked = h * amount * fwd if h > 0 else 0.0
+        series.append(locked + (1 - h) * amount * rates - cost_inr)
+    lo = float(min(x.min() for x in series))
+    hi = float(max(x.max() for x in series))
+    if lo < 0 < hi:
+        w = (hi - lo) / bins
+        k = int(np.ceil(-lo / w))
+        lo = -k * w
+        n = int(np.ceil((hi - lo) / w + 1e-9))
+    else:
+        w = ((hi - lo) / bins) or 1.0
+        n = bins
+    edges = [lo + w * i for i in range(n + 1)]
+    pct = []
+    for x in series:
+        counts, _ = np.histogram(x, bins=edges)
+        pct.append([round(100.0 * float(c) / len(x), 2) for c in counts])
+    return edges, pct
+
+
 def recommend(options, fwd):
     """Simple, explainable rule based on the chance of loss with no hedge."""
     unhedged = options[0]
