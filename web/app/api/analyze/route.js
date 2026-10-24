@@ -50,7 +50,8 @@ export async function POST(request) {
     // ok:false here means the agents answered with a message for the user
     // (bad invoice, unknown currency, timeout), not a server failure.
     return NextResponse.json({ ok: Boolean(data.ok && result), reply: data.reply, result });
-  } catch {
-    return bad("Can't reach the HedgeDesk agents. Is run_all.py running?", 502);
+  }  catch (e) {
+    console.error("analyze failed:", e);
+    return bad(`Can't reach the HedgeDesk agents (${e?.cause?.code || e?.name || e?.message}).`, 502);
   }
 }
